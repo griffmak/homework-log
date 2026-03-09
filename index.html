@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c6af7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Homework" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Homework Log</title>
+  <style>
+    /* ── Custom Properties ─────────────────────────────────── */
+    :root {
+      --bg:             #0f0f13;
+      --surface:        #1a1a23;
+      --surface2:       #202030;
+      --border:         #2a2a38;
+      --border-subtle:  #22222e;
+
+      --text:           #f0eef8;
+      --text-2:         #8080a0;
+      --text-muted:     #55556a;
+
+      --accent:         #7c6af7;
+      --accent-dim:     rgba(124,106,247,0.15);
+      --accent-hover:   #8f7ef9;
+
+      --overdue:        #ef4444;
+      --overdue-bg:     rgba(239,68,68,0.07);
+      --today:          #f59e0b;
+      --today-bg:       rgba(245,158,11,0.07);
+      --done-check:     #22c55e;
+      --danger:         #ef4444;
+
+      /* Subject badges */
+      --math-bg:        rgba(59,130,246,0.15);   --math-tx:    #93c5fd;
+      --english-bg:     rgba(139,92,246,0.15);   --english-tx: #c4b5fd;
+      --science-bg:     rgba(34,197,94,0.15);    --science-tx: #86efac;
+      --history-bg:     rgba(245,158,11,0.15);   --history-tx: #fcd34d;
+      --spanish-bg:     rgba(249,115,22,0.15);   --spanish-tx: #fdba74;
+      --other-bg:       rgba(107,114,128,0.15);  --other-tx:   #9ca3af;
+
+      --radius-card:    12px;
+      --radius-pill:    999px;
+      --radius-btn:     10px;
+      --tap:            44px;
+      --header-h:       56px;
+      --ease-out:       cubic-bezier(0.22,1,0.36,1);
+      --ease-spring:    cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* ── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+
+    body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    button { font: inherit; cursor: pointer; }
+    input, textarea { font: inherit; }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+
+    button, a, [role="button"] { touch-action: manipulation; }
+
+    /* ── App shell ──────────────────────────────────────────── */
+    #app {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .screen {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       SCREEN 1 — PICKER
+    ════════════════════════════════════════════════════════ */
+    #picker-screen {
+      justify-content: center;
+      align-items: center;
+      padding: 40px 24px calc(40px + env(safe-area-inset-bottom));
+      gap: 0;
+    }
+
+    .picker-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 48px;
+    }
+
+    .picker-logo__icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(124,106,247,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    .picker-logo__title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .picker-logo__sub {
+      font-size: 13px;
+      color: var(--text-2);
+    }
+
+    .picker-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      align-self: flex-start;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .picker-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .picker-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      color: var(--text);
+      text-align: left;
+      transition: background 120ms ease, border-color 120ms ease, transform 120ms var(--ease-spring);
+      min-height: var(--tap);
+    }
+
+    @media (hover: hover) {
+      .picker-btn:hover {
+        background: var(--surface2);
+        border-color: rgba(124,106,247,0.45);
+      }
+    }
+
+    .picker-btn:active { transform: scale(0.975); background: var(--surface2); }
+
+    .picker-btn__avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid rgba(124,106,247,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .picker-btn__name {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .picker-btn__arrow {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       SCREEN 2 — MAIN
+    ════════════════════════════════════════════════════════ */
+    #main-screen { display: none; flex-direction: column; }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: var(--header-h);
+      background: rgba(15,15,19,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+    }
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 120ms ease, color 120ms ease;
+      min-height: var(--tap);
+      min-width: 36px;
+    }
+
+    @media (hover: hover) {
+      .back-btn:hover { background: var(--surface); color: var(--text); }
+    }
+
+    .back-btn:active { transform: scale(0.9); }
+
+    .header-name {
+      flex: 1;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .add-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 16px;
+      height: 34px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: background 120ms ease, transform 120ms var(--ease-spring);
+      white-space: nowrap;
+    }
+
+    @media (hover: hover) {
+      .add-btn:hover { background: var(--accent-hover); }
+    }
+
+    .add-btn:active { transform: scale(0.93); }
+
+    /* Content area */
+    .content {
+      flex: 1;
+      padding: 8px 16px calc(32px + env(safe-area-inset-bottom));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 56px 24px;
+      gap: 10px;
+    }
+
+    .empty-state .empty-icon { font-size: 40px; opacity: 0.5; }
+    .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--text); }
+    .empty-state p  { font-size: 13px; color: var(--text-2); }
+
+    /* Section labels */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 22px 0 8px;
+      padding: 0 2px;
+    }
+
+    .section-label:first-child { margin-top: 12px; }
+    .section-label.overdue { color: var(--overdue); }
+    .section-label.today   { color: var(--today); }
+    .section-label.upcoming{ color: var(--accent); opacity: 0.9; }
+
+    /* Done section toggle */
+    .done-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 22px 0 0;
+      padding: 0 2px;
+      min-height: var(--tap);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .done-toggle .section-label { margin: 0; color: var(--text-muted); }
+
+    .done-toggle .toggle-arrow {
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: transform 220ms var(--ease-out);
+    }
+
+    .done-toggle.expanded .toggle-arrow { transform: rotate(90deg); }
+
+    /* ── Assignment Card ─────────────────────────────────── */
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 12px 12px 12px 10px;
+      margin-bottom: 8px;
+      animation: card-in 220ms var(--ease-out) both;
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+
+    @media (hover: hover) {
+      .card:hover { background: var(--surface2); }
+    }
+
+    .card.is-overdue {
+      border-left: 3px solid var(--overdue);
+      background: var(--overdue-bg);
+      border-color: rgba(239,68,68,0.25);
+    }
+
+    .card.is-today {
+      border-left: 3px solid var(--today);
+      background: var(--today-bg);
+      border-color: rgba(245,158,11,0.25);
+    }
+
+    .card.is-done { opacity: 0.6; }
+
+    /* Check button */
+    .check-btn {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 1px;
+      transition: border-color 120ms ease, background 120ms ease, transform 120ms var(--ease-spring);
+      min-height: var(--tap);
+      min-width: 26px;
+    }
+
+    @media (hover: hover) {
+      .check-btn:hover {
+        border-color: var(--done-check);
+        background: rgba(34,197,94,0.1);
+      }
+    }
+
+    .check-btn:active { transform: scale(0.88); }
+
+    .check-btn.checked {
+      background: var(--done-check);
+      border-color: var(--done-check);
+      color: #fff;
+    }
+
+    .check-btn.checked::after { content: '✓'; }
+
+    /* Card body */
+    .card-body { flex: 1; min-width: 0; }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .subject-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-Math    { background: var(--math-bg);    color: var(--math-tx);    }
+    .badge-English { background: var(--english-bg); color: var(--english-tx); }
+    .badge-Science { background: var(--science-bg); color: var(--science-tx); }
+    .badge-History { background: var(--history-bg); color: var(--history-tx); }
+    .badge-Spanish { background: var(--spanish-bg); color: var(--spanish-tx); }
+    .badge-Other   { background: var(--other-bg);   color: var(--other-tx);   }
+
+    .due-label {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .due-label.overdue { color: var(--overdue); font-weight: 600; }
+    .due-label.today   { color: var(--today);   font-weight: 600; }
+
+    .card-text {
+      font-size: 15px;
+      color: var(--text);
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .card.is-done .card-text {
+      text-decoration: line-through;
+      color: var(--text-2);
+      text-decoration-color: var(--text-muted);
+    }
+
+    .card-note {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 4px;
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    /* Countdown / Keep */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .countdown-text { font-size: 11px; color: var(--text-muted); }
+
+    .keep-btn {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: none;
+      border: none;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      transition: color 120ms ease;
+    }
+
+    .keep-btn:active { color: var(--accent-hover); }
+
+    /* Delete button */
+    .delete-btn {
+      flex-shrink: 0;
+      width: 32px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: color 120ms ease, background 120ms ease, transform 120ms var(--ease-spring);
+      border-radius: 6px;
+      min-height: var(--tap);
+      min-width: 32px;
+    }
+
+    @media (hover: hover) {
+      .delete-btn:hover {
+        color: var(--danger);
+        background: rgba(239,68,68,0.1);
+      }
+
+      /* On desktop, hide until card hovered */
+      .card .delete-btn { opacity: 0; }
+      .card:hover .delete-btn { opacity: 1; }
+    }
+
+    .delete-btn:active { transform: scale(0.88); color: var(--danger); }
+
+    /* ════════════════════════════════════════════════════════
+       ADD MODAL — slide-up sheet
+    ════════════════════════════════════════════════════════ */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90dvh;
+      max-height: 90vh; /* fallback */
+      max-height: 90dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 0 0 calc(24px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      transition: transform 300ms cubic-bezier(0.32,0.72,0,1);
+    }
+
+    .modal-backdrop.open .modal { transform: translateY(0); }
+
+    .modal-handle {
+      display: flex;
+      justify-content: center;
+      padding: 12px 0 4px;
+    }
+
+    .modal-handle::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 4px;
+      border-radius: var(--radius-pill);
+      background: var(--border);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px 16px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-cancel-text {
+      background: transparent;
+      border: none;
+      color: var(--text-2);
+      font-size: 15px;
+      padding: 6px 0 6px 12px;
+      min-height: var(--tap);
+      display: flex;
+      align-items: center;
+      transition: color 120ms ease;
+    }
+
+    .btn-cancel-text:active { color: var(--text); }
+
+    .modal-body {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Subject pills */
+    .subject-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .subject-pill {
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 500;
+      min-height: var(--tap);
+      display: flex;
+      align-items: center;
+      transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms var(--ease-spring);
+    }
+
+    .subject-pill:active { transform: scale(0.92); }
+
+    .subject-pill.selected {
+      background: var(--accent-dim);
+      border-color: rgba(124,106,247,0.5);
+      color: var(--accent-hover);
+    }
+
+    @media (hover: hover) {
+      .subject-pill:not(.selected):hover {
+        background: var(--surface2);
+        border-color: #33334a;
+        color: var(--text);
+      }
+    }
+
+    /* Selected per-subject coloring */
+    .subject-pill[data-subject="Math"].selected    { background: var(--math-bg);    color: var(--math-tx);    border-color: rgba(59,130,246,0.4); }
+    .subject-pill[data-subject="English"].selected { background: var(--english-bg); color: var(--english-tx); border-color: rgba(139,92,246,0.4); }
+    .subject-pill[data-subject="Science"].selected { background: var(--science-bg); color: var(--science-tx); border-color: rgba(34,197,94,0.4); }
+    .subject-pill[data-subject="History"].selected { background: var(--history-bg); color: var(--history-tx); border-color: rgba(245,158,11,0.4); }
+    .subject-pill[data-subject="Spanish"].selected { background: var(--spanish-bg); color: var(--spanish-tx); border-color: rgba(249,115,22,0.4); }
+    .subject-pill[data-subject="Other"].selected   { background: var(--other-bg);   color: var(--other-tx);   border-color: rgba(107,114,128,0.4); }
+
+    /* Form fields */
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .field-input,
+    .field-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-btn);
+      color: var(--text);
+      font-size: 16px; /* 16px minimum — prevents iOS zoom */
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+      -webkit-appearance: none;
+      min-height: var(--tap);
+    }
+
+    .field-input:focus,
+    .field-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124,106,247,0.15);
+    }
+
+    .field-textarea {
+      min-height: 80px;
+      resize: none;
+      line-height: 1.5;
+    }
+
+    .field-error {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .field-error.visible { display: block; }
+
+    /* Save button */
+    .btn-save {
+      width: 100%;
+      padding: 15px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
+      min-height: var(--tap);
+      transition: background 120ms ease, transform 120ms var(--ease-spring);
+      margin-top: 6px;
+    }
+
+    @media (hover: hover) {
+      .btn-save:hover { background: var(--accent-hover); }
+    }
+
+    .btn-save:active { transform: scale(0.97); }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Misc ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--radius-pill); }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Picker Screen ──────────────────────────────────── -->
+  <div id="picker-screen" class="screen">
+    <div class="picker-logo">
+      <div class="picker-logo__icon">📚</div>
+      <div class="picker-logo__title">Homework Log</div>
+      <div class="picker-logo__sub">Stay on top of it.</div>
+    </div>
+    <div class="picker-label">Who are you?</div>
+    <div class="picker-buttons" id="picker-buttons">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ── Main Screen ────────────────────────────────────── -->
+  <div id="main-screen" class="screen">
+    <div class="header">
+      <button class="back-btn" id="back-btn" aria-label="Back">&#8592;</button>
+      <span class="header-name" id="header-name"></span>
+      <button class="add-btn" id="add-btn">＋ Add</button>
+    </div>
+    <div class="content" id="content">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Add Modal ──────────────────────────────────────── -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">New Assignment</div>
+      <button class="btn-cancel-text" id="btn-cancel">Cancel</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Subject pills -->
+      <div>
+        <label class="field-label">Subject</label>
+        <div class="subject-pills" id="subject-pills"><!-- Rendered by JS --></div>
+        <div class="field-error" id="subject-error">Pick a subject first.</div>
+      </div>
+
+      <!-- Assignment text -->
+      <div>
+        <label class="field-label" for="assign-text">Assignment</label>
+        <input class="field-input" type="text" id="assign-text"
+               placeholder="e.g. Chapter 5 review questions"
+               autocomplete="off" autocorrect="off" />
+        <div class="field-error" id="text-error">What's the assignment?</div>
+      </div>
+
+      <!-- Due date -->
+      <div>
+        <label class="field-label" for="assign-due">Due date</label>
+        <input class="field-input" type="date" id="assign-due" />
+      </div>
+
+      <!-- Note -->
+      <div>
+        <label class="field-label" for="assign-note">Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-muted)">(optional)</span></label>
+        <textarea class="field-textarea" id="assign-note" placeholder="Any extra info?"></textarea>
+      </div>
+
+      <button class="btn-save" id="btn-save">Save Assignment</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Config ──────────────────────────────────────────────────
+const STUDENTS = ["Luisia", "Enzo"];
+const SUBJECTS  = ["Math", "English", "Science", "History", "Spanish", "Other"];
+const KEEP_DAYS = 7;
+const KEY = name => `hw_${name}`;
+
+// ── State ───────────────────────────────────────────────────
+let currentStudent = null;
+let doneExpanded   = false;
+
+// ── Utils ───────────────────────────────────────────────────
+const genId = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+const todayStr = () => new Date().toISOString().split('T')[0];
+
+function tomorrowStr() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
+function daysBetween(tsMs) {
+  return Math.floor((Date.now() - tsMs) / 86400000);
+}
+
+// Appending T00:00:00 treats the date as local time, avoiding UTC offset issues on iOS
+function formatDue(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ── Storage ─────────────────────────────────────────────────
+function load(name) {
+  try { return JSON.parse(localStorage.getItem(KEY(name))) || []; }
+  catch { return []; }
+}
+
+function save(name, items) {
+  localStorage.setItem(KEY(name), JSON.stringify(items));
+}
+
+// ── Auto-cleanup ─────────────────────────────────────────────
+function autoClean(name) {
+  const items = load(name);
+  const cleaned = items.filter(item => {
+    if (!item.done) return true;
+    if (item.keep) return true;
+    if (item.completedAt == null) return true;
+    return daysBetween(item.completedAt) <= KEEP_DAYS;
+  });
+  if (cleaned.length !== items.length) save(name, cleaned);
+  return cleaned;
+}
+
+// ── Grouping ─────────────────────────────────────────────────
+function groupItems(items) {
+  const today    = todayStr();
+  const overdue  = [], dueToday = [], upcoming = [], done = [];
+  for (const item of items) {
+    if (item.done)                   done.push(item);
+    else if (item.dueDate < today)   overdue.push(item);
+    else if (item.dueDate === today) dueToday.push(item);
+    else                             upcoming.push(item);
+  }
+  const byDue = (a, b) => a.dueDate.localeCompare(b.dueDate);
+  overdue.sort(byDue);
+  dueToday.sort(byDue);
+  upcoming.sort(byDue);
+  done.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+  return { overdue, dueToday, upcoming, done };
+}
+
+// ── Card HTML ────────────────────────────────────────────────
+function dueLabelHtml(item) {
+  const today  = todayStr();
+  let cls = '', label = `Due ${formatDue(item.dueDate)}`;
+  if (!item.done) {
+    if (item.dueDate < today)     { cls = 'overdue'; label = `Overdue · ${formatDue(item.dueDate)}`; }
+    else if (item.dueDate === today) { cls = 'today'; label = 'Due today'; }
+  }
+  return `<span class="due-label ${cls}">${esc(label)}</span>`;
+}
+
+function cardFooterHtml(item) {
+  if (!item.done || item.keep || item.completedAt == null) return '';
+  const remaining = KEEP_DAYS - daysBetween(item.completedAt);
+  if (remaining <= 0) return '';
+  return `
+    <div class="card-footer">
+      <span class="countdown-text">Removing in ${remaining} day${remaining !== 1 ? 's' : ''}</span>
+      <button class="keep-btn" onclick="handleKeep('${esc(item.id)}')">· Keep</button>
+    </div>`;
+}
+
+function cardHtml(item) {
+  const today = todayStr();
+  let cls = '';
+  if (item.done)                   cls = 'is-done';
+  else if (item.dueDate < today)   cls = 'is-overdue';
+  else if (item.dueDate === today) cls = 'is-today';
+
+  return `
+    <div class="card ${cls}" data-id="${esc(item.id)}">
+      <button class="check-btn ${item.done ? 'checked' : ''}"
+              onclick="handleToggle('${esc(item.id)}')"
+              aria-label="${item.done ? 'Mark undone' : 'Mark done'}">
+      </button>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="subject-badge badge-${esc(item.subject)}">${esc(item.subject)}</span>
+          ${dueLabelHtml(item)}
+        </div>
+        <div class="card-text">${esc(item.text)}</div>
+        ${item.note ? `<div class="card-note">${esc(item.note)}</div>` : ''}
+        ${cardFooterHtml(item)}
+      </div>
+      <button class="delete-btn" onclick="handleDelete('${esc(item.id)}')" aria-label="Delete">&#x2715;</button>
+    </div>`;
+}
+
+function sectionHtml(label, items, cls) {
+  if (!items.length) return '';
+  return `<div class="section-label ${cls}">${label}</div>${items.map(cardHtml).join('')}`;
+}
+
+// ── Render ───────────────────────────────────────────────────
+function render() {
+  const items = load(currentStudent);
+  const { overdue, dueToday, upcoming, done } = groupItems(items);
+  const total = overdue.length + dueToday.length + upcoming.length + done.length;
+  const el = document.getElementById('content');
+
+  if (total === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">✅</span>
+        <h3>All clear!</h3>
+        <p>Nothing logged yet. Tap <strong>＋ Add</strong> to add an assignment.</p>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  html += sectionHtml('⚠ Overdue', overdue, 'overdue');
+  html += sectionHtml('Due Today', dueToday, 'today');
+  html += sectionHtml('Upcoming', upcoming, 'upcoming');
+
+  if (done.length) {
+    html += `
+      <div class="done-toggle ${doneExpanded ? 'expanded' : ''}" onclick="toggleDone()">
+        <div class="section-label">Done (${done.length})</div>
+        <span class="toggle-arrow">&#9658;</span>
+      </div>
+      <div id="done-section" style="display:${doneExpanded ? 'block' : 'none'}">
+        ${done.map(cardHtml).join('')}
+      </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ── Handlers ─────────────────────────────────────────────────
+function handleToggle(id) {
+  const items = load(currentStudent);
+  const item  = items.find(i => i.id === id);
+  if (!item) return;
+  item.done        = !item.done;
+  item.completedAt = item.done ? Date.now() : null;
+  if (!item.done) item.keep = false;
+  save(currentStudent, items);
+  render();
+}
+
+function handleDelete(id) {
+  save(currentStudent, load(currentStudent).filter(i => i.id !== id));
+  render();
+}
+
+function handleKeep(id) {
+  const items = load(currentStudent);
+  const item  = items.find(i => i.id === id);
+  if (!item) return;
+  item.keep = true;
+  save(currentStudent, items);
+  render();
+}
+
+function toggleDone() {
+  doneExpanded = !doneExpanded;
+  render();
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function goToPicker() {
+  document.getElementById('picker-screen').style.display = 'flex';
+  document.getElementById('main-screen').style.display  = 'none';
+  currentStudent = null;
+}
+
+function goToMain(name) {
+  currentStudent = name;
+  doneExpanded   = false;
+  autoClean(name);
+  document.getElementById('picker-screen').style.display = 'none';
+  const ms = document.getElementById('main-screen');
+  ms.style.display = 'flex';
+  document.getElementById('header-name').textContent = name;
+  render();
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+let selectedSubject = null;
+
+function openModal() {
+  selectedSubject = null;
+  document.getElementById('assign-text').value = '';
+  document.getElementById('assign-due').value  = tomorrowStr();
+  document.getElementById('assign-note').value = '';
+  document.querySelectorAll('.subject-pill').forEach(p => p.classList.remove('selected'));
+  document.getElementById('subject-error').classList.remove('visible');
+  document.getElementById('text-error').classList.remove('visible');
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Focus after transition
+  setTimeout(() => document.getElementById('assign-text').focus(), 320);
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function selectSubject(subject) {
+  selectedSubject = subject;
+  document.querySelectorAll('.subject-pill').forEach(p =>
+    p.classList.toggle('selected', p.dataset.subject === subject)
+  );
+  document.getElementById('subject-error').classList.remove('visible');
+}
+
+function saveAssignment() {
+  let valid = true;
+  if (!selectedSubject) {
+    document.getElementById('subject-error').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('subject-error').classList.remove('visible');
+  }
+  const text = document.getElementById('assign-text').value.trim();
+  if (!text) {
+    document.getElementById('text-error').classList.add('visible');
+    valid = false;
+  } else {
+    document.getElementById('text-error').classList.remove('visible');
+  }
+  if (!valid) return;
+
+  const item = {
+    id:          genId(),
+    subject:     selectedSubject,
+    text,
+    dueDate:     document.getElementById('assign-due').value || tomorrowStr(),
+    done:        false,
+    keep:        false,
+    completedAt: null,
+    note:        document.getElementById('assign-note').value.trim(),
+    createdAt:   Date.now()
+  };
+
+  const items = load(currentStudent);
+  items.push(item);
+  save(currentStudent, items);
+  closeModal();
+  render();
+}
+
+// ── Boot ──────────────────────────────────────────────────────
+function boot() {
+  // Picker buttons
+  document.getElementById('picker-buttons').innerHTML = STUDENTS.map(name => `
+    <button class="picker-btn" onclick="goToMain('${esc(name)}')">
+      <div class="picker-btn__avatar">${esc(name[0])}</div>
+      <div class="picker-btn__name">${esc(name)}</div>
+      <span class="picker-btn__arrow">›</span>
+    </button>`
+  ).join('');
+
+  // Subject pills
+  document.getElementById('subject-pills').innerHTML = SUBJECTS.map(s =>
+    `<button class="subject-pill" data-subject="${esc(s)}" onclick="selectSubject('${esc(s)}')">${esc(s)}</button>`
+  ).join('');
+
+  document.getElementById('back-btn').addEventListener('click', goToPicker);
+  document.getElementById('add-btn').addEventListener('click', openModal);
+  document.getElementById('btn-cancel').addEventListener('click', closeModal);
+  document.getElementById('btn-save').addEventListener('click', saveAssignment);
+
+  // Enter key saves
+  document.getElementById('assign-text').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); saveAssignment(); }
+  });
+
+  // Backdrop tap closes modal
+  document.getElementById('modal-backdrop').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Prevent sheet taps from closing
+  document.getElementById('modal').addEventListener('click', e => e.stopPropagation());
+
+  // Initial display
+  document.getElementById('picker-screen').style.display = 'flex';
+  document.getElementById('main-screen').style.display  = 'none';
+}
+
+boot();
+</script>
+</body>
+</html>
